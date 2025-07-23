@@ -24,6 +24,9 @@ function getClientUrl(port, authDisabled, sessionToken, serverPort) {
   if (!authDisabled) {
     params.set("MCP_PROXY_AUTH_TOKEN", sessionToken);
   }
+  if (process.env.MCP_PROXY_FULL_ADDRESS) {
+    params.set("MCP_PROXY_FULL_ADDRESS", process.env.MCP_PROXY_FULL_ADDRESS);
+  }
   return params.size > 0 ? `${baseUrl}/?${params.toString()}` : baseUrl;
 }
 
