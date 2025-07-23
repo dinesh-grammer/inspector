@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "everything": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-everything"],
+      "env": {
+        "HELLO": "Hello MCP!"
+      }
+    }
+  },
+  "clientSettings": {
+    "MCP_PROXY_FULL_ADDRESS": "http://10.1.1.22:5577",
+    "MCP_SERVER_REQUEST_TIMEOUT": 15000,
+    "MCP_REQUEST_TIMEOUT_RESET_ON_PROGRESS": true,
+    "MCP_REQUEST_MAX_TOTAL_TIMEOUT": 90000
+  }
+}
