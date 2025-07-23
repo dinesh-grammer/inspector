@@ -366,11 +366,21 @@ const App = () => {
         if (data.defaultArgs) {
           setArgs(data.defaultArgs);
         }
+        // Apply MCP_PROXY_FULL_ADDRESS from server if provided and not already set
+        if (data.mcpProxyFullAddress && !config.MCP_PROXY_FULL_ADDRESS.value) {
+          setConfig((prevConfig) => ({
+            ...prevConfig,
+            MCP_PROXY_FULL_ADDRESS: {
+              ...prevConfig.MCP_PROXY_FULL_ADDRESS,
+              value: data.mcpProxyFullAddress,
+            },
+          }));
+        }
       })
       .catch((error) =>
         console.error("Error fetching default environment:", error),
       );
-  }, [config]);
+  }, [config.MCP_PROXY_AUTH_TOKEN.value]); // Only re-run when auth token changes
 
   useEffect(() => {
     rootsRef.current = roots;

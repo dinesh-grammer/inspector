@@ -190,6 +190,12 @@ To prevent DNS rebinding attacks, the MCP Inspector validates the `Origin` heade
 ALLOWED_ORIGINS=http://localhost:6274,http://localhost:8000 npm start
 ```
 
+You can also set the proxy address via environment variable:
+
+```bash
+MCP_PROXY_FULL_ADDRESS=http://10.1.1.22:5577 npm start
+```
+
 ### Configuration
 
 The MCP Inspector supports the following configuration settings. To change them, click on the `Configuration` button in the MCP Inspector UI:
@@ -199,7 +205,7 @@ The MCP Inspector supports the following configuration settings. To change them,
 | `MCP_SERVER_REQUEST_TIMEOUT`            | Timeout for requests to the MCP server (ms)                                                                                                       | 10000   |
 | `MCP_REQUEST_TIMEOUT_RESET_ON_PROGRESS` | Reset timeout on progress notifications                                                                                                           | true    |
 | `MCP_REQUEST_MAX_TOTAL_TIMEOUT`         | Maximum total timeout for requests sent to the MCP server (ms) (Use with progress notifications)                                                  | 60000   |
-| `MCP_PROXY_FULL_ADDRESS`                | Set this if you are running the MCP Inspector Proxy on a non-default address. Example: http://10.1.1.22:5577                                      | ""      |
+| `MCP_PROXY_FULL_ADDRESS`                | Set this if you are running the MCP Inspector Proxy on a non-default address. Example: http://10.1.1.22:5577. Can also be set as an environment variable. | ""      |
 | `MCP_AUTO_OPEN_ENABLED`                 | Enable automatic browser opening when inspector starts (works with authentication enabled). Only as environment var, not configurable in browser. | true    |
 
 These settings can be adjusted in real-time through the UI and will persist across sessions.
