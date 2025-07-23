@@ -18,7 +18,7 @@ import {
   LoggingLevel,
 } from "@modelcontextprotocol/sdk/types.js";
 import { OAuthTokensSchema } from "@modelcontextprotocol/sdk/shared/auth.js";
-import { SESSION_KEYS, getServerSpecificKey } from "./lib/constants";
+import { SESSION_KEYS, getServerSpecificKey, DEFAULT_MCP_PROXY_LISTEN_PORT } from "./lib/constants";
 import { AuthDebuggerState, EMPTY_DEBUGGER_STATE } from "./lib/auth-types";
 import { OAuthStateMachine } from "./lib/oauth-state-machine";
 import { cacheToolOutputSchemas } from "./utils/schemaUtils";
@@ -356,7 +356,18 @@ const App = () => {
       headers[proxyAuthTokenHeader] = `Bearer ${proxyAuthToken}`;
     }
 
-    fetch(`${getMCPProxyAddress(config)}/config`, { headers })
+    // For the initial config fetch, we need to use a bootstrap address
+    // that doesn't depend on MCP_PROXY_FULL_ADDRESS from config
+    const bootstrapProxyAddress = (() => {
+      // Check for proxy port from query params, fallback to default
+      const proxyPort =
+        new URLSearchParams(window.location.search).get("MCP_PROXY_PORT") || 
+        DEFAULT_MCP_PROXY_LISTEN_PORT;
+      
+      return `${window.location.protocol}//${window.location.hostname}:${proxyPort}`;
+    })();
+
+    fetch(`${bootstrapProxyAddress}/config`, { headers })
       .then((response) => response.json())
       .then((data) => {
         setEnv(data.defaultEnvironment);
