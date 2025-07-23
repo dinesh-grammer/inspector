@@ -3,6 +3,7 @@ export type ConfigItem = {
   description: string;
   value: string | number | boolean;
   is_session_item: boolean;
+  is_from_env?: boolean; // New property to track if value is from environment/query params
 };
 
 /**

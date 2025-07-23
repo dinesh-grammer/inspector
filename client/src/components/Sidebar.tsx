@@ -540,8 +540,25 @@ const Sidebar = ({
             </Button>
             {showConfig && (
               <div className="space-y-2">
+                {config.MCP_PROXY_FULL_ADDRESS?.is_from_env && (
+                  <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200 dark:border-blue-800">
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                      <strong>MCP Proxy Address</strong> is configured via environment variable: 
+                      <code className="ml-2 px-1 py-0.5 bg-blue-100 dark:bg-blue-800 rounded text-xs">
+                        {config.MCP_PROXY_FULL_ADDRESS.value}
+                      </code>
+                    </p>
+                  </div>
+                )}
                 {Object.entries(config).map(([key, configItem]) => {
                   const configKey = key as keyof InspectorConfig;
+                  const isReadOnly = configItem.is_from_env === true;
+                  
+                  // Hide MCP_PROXY_FULL_ADDRESS entirely when it's set from environment
+                  if (configKey === 'MCP_PROXY_FULL_ADDRESS' && isReadOnly) {
+                    return null;
+                  }
+                  
                   return (
                     <div key={key} className="space-y-2">
                       <div className="flex items-center gap-1">
@@ -550,6 +567,9 @@ const Sidebar = ({
                           htmlFor={`${configKey}-input`}
                         >
                           {configItem.label}
+                          {isReadOnly && (
+                            <span className="text-xs text-gray-500 ml-2">(Set by environment)</span>
+                          )}
                         </label>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -557,6 +577,9 @@ const Sidebar = ({
                           </TooltipTrigger>
                           <TooltipContent>
                             {configItem.description}
+                            {isReadOnly && (
+                              <p className="mt-1 text-xs">This value is set by environment variable and cannot be changed.</p>
+                            )}
                           </TooltipContent>
                         </Tooltip>
                       </div>
@@ -566,30 +589,36 @@ const Sidebar = ({
                           type="number"
                           data-testid={`${configKey}-input`}
                           value={configItem.value}
+                          disabled={isReadOnly}
                           onChange={(e) => {
-                            const newConfig = { ...config };
-                            newConfig[configKey] = {
-                              ...configItem,
-                              value: Number(e.target.value),
-                            };
-                            setConfig(newConfig);
+                            if (!isReadOnly) {
+                              const newConfig = { ...config };
+                              newConfig[configKey] = {
+                                ...configItem,
+                                value: Number(e.target.value),
+                              };
+                              setConfig(newConfig);
+                            }
                           }}
-                          className="font-mono"
+                          className={`font-mono ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                         />
                       ) : typeof configItem.value === "boolean" ? (
                         <Select
                           data-testid={`${configKey}-select`}
                           value={configItem.value.toString()}
+                          disabled={isReadOnly}
                           onValueChange={(val) => {
-                            const newConfig = { ...config };
-                            newConfig[configKey] = {
-                              ...configItem,
-                              value: val === "true",
-                            };
-                            setConfig(newConfig);
+                            if (!isReadOnly) {
+                              const newConfig = { ...config };
+                              newConfig[configKey] = {
+                                ...configItem,
+                                value: val === "true",
+                              };
+                              setConfig(newConfig);
+                            }
                           }}
                         >
-                          <SelectTrigger id={`${configKey}-input`}>
+                          <SelectTrigger id={`${configKey}-input`} className={isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -602,15 +631,18 @@ const Sidebar = ({
                           id={`${configKey}-input`}
                           data-testid={`${configKey}-input`}
                           value={configItem.value}
+                          disabled={isReadOnly}
                           onChange={(e) => {
-                            const newConfig = { ...config };
-                            newConfig[configKey] = {
-                              ...configItem,
-                              value: e.target.value,
-                            };
-                            setConfig(newConfig);
+                            if (!isReadOnly) {
+                              const newConfig = { ...config };
+                              newConfig[configKey] = {
+                                ...configItem,
+                                value: e.target.value,
+                              };
+                              setConfig(newConfig);
+                            }
                           }}
-                          className="font-mono"
+                          className={`font-mono ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                         />
                       )}
                     </div>

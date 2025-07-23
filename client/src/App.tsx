@@ -111,6 +111,19 @@ const App = () => {
   const [config, setConfig] = useState<InspectorConfig>(() =>
     initializeInspectorConfig(CONFIG_LOCAL_STORAGE_KEY),
   );
+  
+  // Override setConfig to prevent changing environment-provided values
+  const handleSetConfig = useCallback((newConfig: InspectorConfig) => {
+    // Preserve environment-provided values
+    const protectedConfig = { ...newConfig };
+    for (const [key, value] of Object.entries(config)) {
+      if (value.is_from_env) {
+        // Restore the original environment value
+        protectedConfig[key as keyof InspectorConfig] = value;
+      }
+    }
+    setConfig(protectedConfig);
+  }, [config]);
   const [bearerToken, setBearerToken] = useState<string>(() => {
     return localStorage.getItem("lastBearerToken") || "";
   });
@@ -653,7 +666,7 @@ const App = () => {
           env={env}
           setEnv={setEnv}
           config={config}
-          setConfig={setConfig}
+          setConfig={handleSetConfig}
           bearerToken={bearerToken}
           setBearerToken={setBearerToken}
           headerName={headerName}

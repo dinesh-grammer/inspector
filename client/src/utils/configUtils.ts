@@ -109,6 +109,7 @@ export const getConfigOverridesFromQueryParams = (
       overrides[key as keyof InspectorConfig] = {
         ...defaultConfig[key as keyof InspectorConfig],
         value,
+        is_from_env: true, // Mark as coming from environment/query params
       };
     }
   }
@@ -152,9 +153,18 @@ export const initializeInspectorConfig = (
     };
   }
 
-  // Apply query param overrides
+  // Apply query param overrides - these always take precedence
   const overrides = getConfigOverridesFromQueryParams(DEFAULT_INSPECTOR_CONFIG);
-  return { ...baseConfig, ...overrides };
+  const finalConfig = { ...baseConfig, ...overrides };
+  
+  // Clear the is_from_env flag from any saved config items that don't have query param overrides
+  for (const key of Object.keys(finalConfig)) {
+    if (!overrides[key as keyof InspectorConfig]) {
+      delete finalConfig[key as keyof InspectorConfig].is_from_env;
+    }
+  }
+  
+  return finalConfig;
 };
 
 export const saveInspectorConfig = (
@@ -164,8 +174,13 @@ export const saveInspectorConfig = (
   const persistentConfig: Partial<InspectorConfig> = {};
   const ephemeralConfig: Partial<InspectorConfig> = {};
 
-  // Split config based on is_session_item flag
+  // Split config based on is_session_item flag, excluding items from environment
   for (const [key, value] of Object.entries(config)) {
+    // Skip items that come from environment variables
+    if (value.is_from_env) {
+      continue;
+    }
+    
     if (value.is_session_item) {
       ephemeralConfig[key as keyof InspectorConfig] = value;
     } else {
