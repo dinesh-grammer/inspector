@@ -522,6 +522,7 @@ app.get("/config", originValidationMiddleware, authMiddleware, (req, res) => {
       defaultEnvironment,
       defaultCommand: values.env,
       defaultArgs: values.args,
+      mcpProxyFullAddress: process.env.MCP_PROXY_FULL_ADDRESS || "",
     });
   } catch (error) {
     console.error("Error in /config route:", error);
